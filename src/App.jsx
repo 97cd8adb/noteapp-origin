@@ -27,8 +27,16 @@ const App = () => {
   const updateNote = (index, field, value) => {
     const updateNotes = [...notes];
     updateNotes[index][field] = value;
+    updateNotes[index].updatedAt = new Date();//←日時も更新
     setNotes(updateNotes);
-  }
+  };
+
+  //ノートを更新順にソートx
+  const sortedNotes =[...notes].sort((a, b) => {
+    const timeA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+    const timeB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+    return timeB - timeA
+  })
 
   //ノート選択
   const selectedNote = selectedIndex !== null ? notes[selectedIndex] : null;
@@ -59,25 +67,30 @@ const App = () => {
           onClick={addNote}>ノートを追加する
         </button>
         <ul className="note-list">
-          {notes.map((note, index) =>
+          {sortedNotes.map((note)=> {
+            const originalIndex = notes.findIndex( n => n === note);
+            return(
             <li
-              key={index}
-              className={`note-item ${selectedIndex === index ? "active" : ""}`}
-              onClick={() => setSelectedIndex(index)}
+              key={originalIndex}
+              className={`note-item ${selectedIndex === originalIndex ? "active" : ""}`}
+              onClick={() => setSelectedIndex(originalIndex)}
             >
             <span>
               {note.title || "タイトル無し"}
+              <br />
+              <small>{note.updatedAt ? new Date(note.updatedAt).toLocaleString() : ""}</small>
             </span>
             <button
               className="delete-button"
               onClick={(e) => {
                 e.stopPropagation();
-                deleteNote(index);
+                deleteNote(originalIndex);
               }}
             >削除
             </button>  
             </li>
-          )}
+            );
+          })}
         </ul>
       </div>
 
