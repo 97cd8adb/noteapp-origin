@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import ReactMarkdown from 'react-markdown';
 
+  
 const App = () => {
-  const [notes, setNotes] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState(null)
-
   //ページ読み込み時にlocalStrageから復元
-  useEffect (() => {
+  const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
-    if (savedNotes) {
-      setNotes(JSON.parse(savedNotes));
-    }
-  }, []);
+    return savedNotes ? JSON.parse(savedNotes) : []
+  });
+  const [selectedIndex, setSelectedIndex] = useState(null)
 
   //notesが変わるたびにlocalStrageに保存
   useEffect (() => {
@@ -20,7 +18,7 @@ const App = () => {
 
   //新しいノートを追加
   const addNote = () => {
-    const newNote = { title:"", content:"" };
+    const newNote = { title:"", content:"", updatedAt:new Date() };
     setNotes([...notes, newNote]);
     setSelectedIndex(notes.length);
   };
@@ -37,9 +35,12 @@ const App = () => {
 
   //ノート削除
   const deleteNote = (index) => {
+    if(window.confirm("このノートを削除しますか？")){
     const updatedNotes = notes.filter((note, i) => i !== index);
     setNotes(updatedNotes)
-  }
+    setSelectedIndex(null);
+    };
+  };
 
   return(
     <div className="app">
@@ -88,7 +89,7 @@ const App = () => {
             </div>
             <div className="preview">
               <h1>{selectedNote.title}</h1>
-              <p>{selectedNote.content}</p>
+              <ReactMarkdown>{selectedNote.content}</ReactMarkdown>
             </div>
           </>
         )}
