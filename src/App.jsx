@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import ReactMarkdown from 'react-markdown';
+import Markdown from 'react-markdown';
 
   
 const App = () => {
@@ -42,6 +42,15 @@ const App = () => {
     };
   };
 
+  //追加したノートへフォーカスする
+  const titleInputRef = useRef(null);
+  useEffect (() => {
+    if(selectedNote && titleInputRef.current ) {
+      titleInputRef.current.focus();
+    }
+  }, [selectedIndex])
+
+
   return(
     <div className="app">
       <div className="sidebar">
@@ -61,7 +70,10 @@ const App = () => {
             </span>
             <button
               className="delete-button"
-              onClick={() => deleteNote(index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteNote(index);
+              }}
             >削除
             </button>  
             </li>
@@ -74,6 +86,7 @@ const App = () => {
           <>
             <div className="editor">
               <input
+                ref={titleInputRef}
                 className="title-input"
                 type="text"
                 placeholder="タイトルを入力"
@@ -89,7 +102,7 @@ const App = () => {
             </div>
             <div className="preview">
               <h1>{selectedNote.title}</h1>
-              <ReactMarkdown>{selectedNote.content}</ReactMarkdown>
+              <Markdown>{selectedNote.content}</Markdown>
             </div>
           </>
         )}
